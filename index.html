@@ -1,0 +1,581 @@
+<![CDATA[
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小托福 TOEFL Junior 单词测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .progress-bar {
+            background: rgba(255,255,255,0.3);
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            background: #4ade80;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .start-screen, .result-screen {
+            text-align: center;
+        }
+        
+        .start-screen h2, .result-screen h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .start-screen p, .result-screen p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+            margin-left: 10px;
+        }
+        
+        .btn-secondary:hover {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .quiz-screen {
+            display: none;
+        }
+        
+        .question-number {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .word-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .word-display {
+            font-size: 2.5rem;
+            color: #333;
+            margin: 20px 0 10px;
+            font-weight: 700;
+        }
+        
+        .phonetic {
+            color: #888;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        .options {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            padding: 18px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: left;
+            font-size: 1rem;
+        }
+        
+        .option:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+        
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+        
+        .option.wrong {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+        
+        .option.disabled {
+            pointer-events: none;
+        }
+        
+        .score-display {
+            font-size: 4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+        }
+        
+        .stat-box .number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-box .label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        .wrong-words {
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .wrong-words h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .word-list {
+            display: grid;
+            gap: 10px;
+        }
+        
+        .word-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .word-item .word {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .word-item .meaning {
+            color: #666;
+        }
+        
+        .mode-selector {
+            margin-bottom: 30px;
+        }
+        
+        .mode-btn {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 12px 30px;
+            margin: 5px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+        
+        .mode-btn:hover, .mode-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            .card {
+                padding: 25px;
+            }
+            .word-display {
+                font-size: 2rem;
+            }
+            .stats {
+                grid-template-columns: 1fr;
+            }
+            .word-image {
+                width: 100px;
+                height: 100px;
+                font-size: 50px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 小托福单词测试</h1>
+            <p>TOEFL Junior Vocabulary Quiz</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="card">
+            <!-- 开始界面 -->
+            <div class="start-screen" id="startScreen">
+                <h2>准备好了吗？</h2>
+                <p>本测试包含 50 个小托福核心词汇<br>每个单词配有图示，帮助你联想记忆<br>选择测试模式开始挑战吧！</p>
+                
+                <div class="mode-selector">
+                    <button class="mode-btn active" onclick="selectMode('en2zh')">英译中</button>
+                    <button class="mode-btn" onclick="selectMode('zh2en')">中译英</button>
+                </div>
+                
+                <button class="btn" onclick="startQuiz()">开始测试</button>
+            </div>
+            
+            <!-- 测试界面 -->
+            <div class="quiz-screen" id="quizScreen">
+                <div class="question-number" id="questionNumber">第 1 / 50 题</div>
+                <div class="word-image" id="wordImage">🎯</div>
+                <div class="word-display" id="wordDisplay">abandon</div>
+                <div class="phonetic" id="phonetic">/əˈbændən/</div>
+                <div class="options" id="options"></div>
+            </div>
+            
+            <!-- 结果界面 -->
+            <div class="result-screen" id="resultScreen" style="display: none;">
+                <h2>测试完成！🎉</h2>
+                <div class="score-display" id="scoreDisplay">80%</div>
+                
+                <div class="stats">
+                    <div class="stat-box">
+                        <div class="number" id="correctCount">40</div>
+                        <div class="label">正确</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="wrongCount">10</div>
+                        <div class="label">错误</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number" id="timeSpent">5:30</div>
+                        <div class="label">用时</div>
+                    </div>
+                </div>
+                
+                <div class="wrong-words" id="wrongWordsSection" style="display: none;">
+                    <h3>📚 需要复习的单词</h3>
+                    <div class="word-list" id="wordList"></div>
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <button class="btn" onclick="restartQuiz()">再测一次</button>
+                    <button class="btn btn-secondary" onclick="goHome()">返回首页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 小托福核心词汇50个 - 配有emoji图示
+        const vocabulary = [
+            { word: "abandon", phonetic: "/əˈbændən/", meaning: "放弃，抛弃", emoji: "🚶‍♂️💨", hint: "离开、抛弃", distractors: ["保留", "获得", "寻找"] },
+            { word: "ability", phonetic: "/əˈbɪləti/", meaning: "能力，才能", emoji: "💪🧠", hint: "能力和才智", distractors: ["残疾", "弱点", "困难"] },
+            { word: "absent", phonetic: "/ˈæbsənt/", meaning: "缺席的，不在的", emoji: "❌🏫", hint: "不在场", distractors: ["出席的", "专注的", "活跃的"] },
+            { word: "absolute", phonetic: "/ˈæbsəluːt/", meaning: "绝对的，完全的", emoji: "💯", hint: "百分之百", distractors: ["相对的", "部分的", "可能的"] },
+            { word: "absorb", phonetic: "/əbˈzɔːrb/", meaning: "吸收，吸引", emoji: "🧽💧", hint: "海绵吸水", distractors: ["释放", "排斥", "分散"] },
+            { word: "abstract", phonetic: "/ˈæbstrækt/", meaning: "抽象的，理论上的", emoji: "🎨🌀", hint: "抽象艺术", distractors: ["具体的", "实际的", "形象的"] },
+            { word: "abundant", phonetic: "/əˈbʌndənt/", meaning: "丰富的，充裕的", emoji: "🍎🍊🍇", hint: "丰盛的果实", distractors: ["稀少的", "缺乏的", "贫瘠的"] },
+            { word: "academic", phonetic: "/ˌækəˈdemɪk/", meaning: "学术的，理论的", emoji: "📚🎓", hint: "学术毕业", distractors: ["实践的", "商业的", "工业的"] },
+            { word: "accelerate", phonetic: "/əkˈseləreɪt/", meaning: "加速，促进", emoji: "🚀⚡", hint: "火箭加速", distractors: ["减速", "停止", "延缓"] },
+            { word: "access", phonetic: "/ˈækses/", meaning: "进入，使用权", emoji: "🚪🔑", hint: "开门钥匙", distractors: ["退出", "禁止", "限制"] },
+            { word: "accommodate", phonetic: "/əˈkɑːmədeɪt/", meaning: "容纳，适应", emoji: "🏨🛏️", hint: "酒店容纳", distractors: ["拒绝", "排斥", "忽视"] },
+            { word: "accomplish", phonetic: "/əˈkʌmplɪʃ/", meaning: "完成，实现", emoji: "✅🏆", hint: "完成目标", distractors: ["开始", "放弃", "失败"] },
+            { word: "accurate", phonetic: "/ˈækjərət/", meaning: "精确的，准确的", emoji: "🎯✓", hint: "正中靶心", distractors: ["错误的", "模糊的", "大概的"] },
+            { word: "achieve", phonetic: "/əˈtʃiːv/", meaning: "达到，实现", emoji: "🏔️🏆", hint: "登顶成功", distractors: ["失去", "放弃", "失败"] },
+            { word: "acknowledge", phonetic: "/əkˈnɑːlɪdʒ/", meaning: "承认，致谢", emoji: "🙋‍♂️🙏", hint: "举手感谢", distractors: ["否认", "忽视", "拒绝"] },
+            { word: "acquire", phonetic: "/əˈkwaɪər/", meaning: "获得，学到", emoji: "🎁✋", hint: "获得礼物", distractors: ["失去", "放弃", "丢弃"] },
+            { word: "adapt", phonetic: "/əˈdæpt/", meaning: "适应，改编", emoji: "🦎🌿", hint: "变色龙适应", distractors: ["抗拒", "放弃", "坚持"] },
+            { word: "adequate", phonetic: "/ˈædɪkwət/", meaning: "足够的，适当的", emoji: "✅📏", hint: "刚刚好", distractors: ["不足的", "过度的", "贫乏的"] },
+            { word: "adjust", phonetic: "/əˈdʒʌst/", meaning: "调整，适应", emoji: "🔧⚙️", hint: "工具调整", distractors: ["固定", "保持", "放弃"] },
+            { word: "administer", phonetic: "/ədˈmɪnɪstər/", meaning: "管理，执行", emoji: "📋👔", hint: "办公管理", distractors: ["放弃", "破坏", "忽视"] },
+            { word: "admire", phonetic: "/ədˈmaɪər/", meaning: "钦佩，赞赏", emoji: "👏😍", hint: "鼓掌欣赏", distractors: ["鄙视", "嘲笑", "忽视"] },
+            { word: "admit", phonetic: "/ədˈmɪt/", meaning: "承认，准许进入", emoji: "🚪✅", hint: "准许进入", distractors: ["否认", "拒绝", "驱逐"] },
+            { word: "adopt", phonetic: "/əˈdɑːpt/", meaning: "采用，收养", emoji: "👶🏠", hint: "收养孩子", distractors: ["放弃", "拒绝", "忽视"] },
+            { word: "advance", phonetic: "/ədˈvæns/", meaning: "前进，提前", emoji: "➡️🚀", hint: "向前进", distractors: ["后退", "延迟", "放弃"] },
+            { word: "advantage", phonetic: "/ədˈvæntɪdʒ/", meaning: "优势，好处", emoji: "🏆⬆️", hint: "优势上升", distractors: ["劣势", "缺点", "损失"] },
+            { word: "adventure", phonetic: "/ədˈventʃər/", meaning: "冒险，奇遇", emoji: "🏕️🗺️", hint: "探险地图", distractors: ["安全", "平常", "稳定"] },
+            { word: "advertise", phonetic: "/ˈædvərtaɪz/", meaning: "做广告，宣传", emoji: "📢📺", hint: "广告宣传", distractors: ["隐藏", "保密", "忽视"] },
+            { word: "advice", phonetic: "/ədˈvaɪs/", meaning: "建议，忠告", emoji: "💡🗣️", hint: "提建议", distractors: ["命令", "批评", "指责"] },
+            { word: "advocate", phonetic: "/ˈædvəkeɪt/", meaning: "提倡，拥护", emoji: "📣✊", hint: "大声提倡", distractors: ["反对", "抵制", "忽视"] },
+            { word: "affect", phonetic: "/əˈfekt/", meaning: "影响，感动", emoji: "🌊💫", hint: "产生影响", distractors: ["忽视", "放弃", "避免"] },
+            { word: "afford", phonetic: "/əˈfɔːrd/", meaning: "负担得起，提供", emoji: "💰✅", hint: "买得起", distractors: ["拒绝", "放弃", "缺乏"] },
+            { word: "aggressive", phonetic: "/əˈɡresɪv/", meaning: "侵略的，进取的", emoji: "🐂💥", hint: "猛牛冲撞", distractors: ["温和的", "消极的", "懦弱的"] },
+            { word: "agree", phonetic: "/əˈɡriː/", meaning: "同意，赞成", emoji: "🤝✅", hint: "握手同意", distractors: ["反对", "拒绝", "争论"] },
+            { word: "aid", phonetic: "/eɪd/", meaning: "帮助，援助", emoji: "🚑🤝", hint: "救援帮助", distractors: ["阻碍", "破坏", "忽视"] },
+            { word: "aim", phonetic: "/eɪm/", meaning: "目标，瞄准", emoji: "🎯👁️", hint: "瞄准目标", distractors: ["放弃", "随意", "迷失"] },
+            { word: "alarm", phonetic: "/əˈlɑːrm/", meaning: "警报，惊慌", emoji: "🚨🔔", hint: "警报响起", distractors: ["安全", "平静", "舒适"] },
+            { word: "alert", phonetic: "/əˈlɜːrt/", meaning: "警觉的，警惕的", emoji: "👀⚡", hint: "警惕观察", distractors: ["迟钝的", "困倦的", "放松的"] },
+            { word: "allocate", phonetic: "/ˈæləkeɪt/", meaning: "分配，配置", emoji: "🍕📊", hint: "分配资源", distractors: ["收集", "保留", "浪费"] },
+            { word: "allow", phonetic: "/əˈlaʊ/", meaning: "允许，准许", emoji: "✅🚦", hint: "绿灯通行", distractors: ["禁止", "拒绝", "阻止"] },
+            { word: "alter", phonetic: "/ˈɔːltər/", meaning: "改变，修改", emoji: "✂️🔄", hint: "修改调整", distractors: ["保持", "坚持", "固定"] },
+            { word: "alternative", phonetic: "/ɔːlˈtɜːrnətɪv/", meaning: "替代的，选择", emoji: "🔄🛤️", hint: "另一选择", distractors: ["唯一的", "强制的", "必然的"] },
+            { word: "amateur", phonetic: "/ˈæmətər/", meaning: "业余的，业余爱好者", emoji: "📷🎨", hint: "业余爱好", distractors: ["专业的", "职业的", "专家的"] },
+            { word: "amaze", phonetic: "/əˈmeɪz/", meaning: "使惊奇，使惊愕", emoji: "😲✨", hint: "惊讶表情", distractors: ["使无聊", "使厌烦", "使失望"] },
+            { word: "ambition", phonetic: "/æmˈbɪʃn/", meaning: "雄心，抱负", emoji: "🎯🔥", hint: "雄心壮志", distractors: ["懒惰", "平庸", "放弃"] },
+            { word: "analyze", phonetic: "/ˈænəlaɪz/", meaning: "分析，解析", emoji: "🔬📊", hint: "分析研究", distractors: ["合成", "混合", "忽视"] },
+            { word: "ancient", phonetic: "/ˈeɪnʃənt/", meaning: "古代的，古老的", emoji: "🏛️📜", hint: "古代建筑", distractors: ["现代的", "新颖的", "未来的"] },
+            { word: "announce", phonetic: "/əˈnaʊns/", meaning: "宣布，通告", emoji: "📢📰", hint: "公告宣布", distractors: ["隐瞒", "保密", "否认"] },
+            { word: "annoy", phonetic: "/əˈnɔɪ/", meaning: "惹恼，使烦恼", emoji: "😤🦟", hint: "蚊子烦人", distractors: ["取悦", "安抚", "满足"] },
+            { word: "annual", phonetic: "/ˈænjuəl/", meaning: "每年的，年度的", emoji: "📅🎉", hint: "年度活动", distractors: ["每月的", "每日的", "永久的"] },
+            { word: "anticipate", phonetic: "/ænˈtɪsɪpeɪt/", meaning: "预期，期望", emoji: "🔮👀", hint: "期待预见", distractors: ["回顾", "后悔", "忽视"] }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let wrongAnswers = [];
+        let mode = 'en2zh';
+        let startTime;
+        let shuffledVocabulary;
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function selectMode(selectedMode) {
+            mode = selectedMode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function startQuiz() {
+            shuffledVocabulary = shuffleArray(vocabulary);
+            currentQuestion = 0;
+            score = 0;
+            wrongAnswers = [];
+            startTime = Date.now();
+            
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = shuffledVocabulary[currentQuestion];
+            const progress = ((currentQuestion + 1) / 50) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            document.getElementById('questionNumber').textContent = `第 ${currentQuestion + 1} / 50 题`;
+            
+            // 显示单词图片
+            document.getElementById('wordImage').textContent = q.emoji;
+            
+            if (mode === 'en2zh') {
+                document.getElementById('wordDisplay').textContent = q.word;
+                document.getElementById('phonetic').textContent = q.phonetic;
+                document.getElementById('phonetic').style.display = 'block';
+                
+                const options = shuffleArray([q.meaning, ...q.distractors]);
+                createOptions(options, q.meaning);
+            } else {
+                document.getElementById('wordDisplay').textContent = q.meaning;
+                document.getElementById('phonetic').style.display = 'none';
+                
+                const otherWords = vocabulary.filter(v => v.word !== q.word);
+                const distractorWords = shuffleArray(otherWords).slice(0, 3).map(v => v.word);
+                const options = shuffleArray([q.word, ...distractorWords]);
+                createOptions(options, q.word);
+            }
+        }
+
+        function createOptions(options, correct) {
+            const container = document.getElementById('options');
+            container.innerHTML = '';
+            
+            options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option';
+                btn.textContent = option;
+                btn.onclick = () => checkAnswer(btn, option, correct);
+                container.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(btn, selected, correct) {
+            const buttons = document.querySelectorAll('.option');
+            buttons.forEach(b => b.classList.add('disabled'));
+            
+            const q = shuffledVocabulary[currentQuestion];
+            
+            if (selected === correct) {
+                btn.classList.add('correct');
+                score++;
+            } else {
+                btn.classList.add('wrong');
+                buttons.forEach(b => {
+                    if (b.textContent === correct) {
+                        b.classList.add('correct');
+                    }
+                });
+                wrongAnswers.push({
+                    word: q.word,
+                    phonetic: q.phonetic,
+                    meaning: q.meaning,
+                    emoji: q.emoji
+                });
+            }
+            
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < 50) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1200);
+        }
+
+        function showResult() {
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+            document.getElementById('progressFill').style.width = '100%';
+            
+            const percentage = Math.round((score / 50) * 100);
+            document.getElementById('scoreDisplay').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('wrongCount').textContent = 50 - score;
+            
+            const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(timeSpent / 60);
+            const seconds = timeSpent % 60;
+            document.getElementById('timeSpent').textContent = 
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            const wrongSection = document.getElementById('wrongWordsSection');
+            const wordList = document.getElementById('wordList');
+            
+            if (wrongAnswers.length > 0) {
+                wrongSection.style.display = 'block';
+                wordList.innerHTML = wrongAnswers.map(w => `
+                    <div class="word-item">
+                        <div>
+                            <span style="font-size: 1.5rem; margin-right: 8px;">${w.emoji}</span>
+                            <span class="word">${w.word}</span>
+                            <span style="color: #888; margin-left: 10px;">${w.phonetic}</span>
+                        </div>
+                        <span class="meaning">${w.meaning}</span>
+                    </div>
+                `).join('');
+            } else {
+                wrongSection.style.display = 'none';
+            }
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        function goHome() {
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+            document.getElementById('progressFill').style.width = '0%';
+        }
+    </script>
+</body>
+</html>
+]]>
